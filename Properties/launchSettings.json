@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SmartStoreZip": {
+      "commandName": "Project",
+      "commandLineArgs": "test.zip"
+    }
+  }
+}

@@ -95,10 +95,12 @@ sealed class Program
     static IEnumerable<string> ReadInput()
     {
         BlockingCollection<string> queue = [];
+        bool first = true;
         Console.CancelKeyPress += (sender, e) =>
         {
-            if (queue.IsAddingCompleted)
+            if (!first)
                 return; // hard exit
+            first = false;
             e.Cancel = true;
             queue.CompleteAdding(); // soft exit
             Console.Error.WriteLine("Press Ctrl+C again to force exit.");
@@ -109,7 +111,18 @@ sealed class Program
             while (Console.In.ReadLine().AsSpan().Trim().Trim('"') is { IsEmpty: false } line && queue.TryAdd(new(line))) ;
             queue.CompleteAdding();
         });
-        while (queue.TryTake(out string? item, Timeout.Infinite))
+        while (!queue.IsCompleted)
+        {
+            string item;
+            try
+            {
+                item = queue.Take();
+            }
+            catch
+            {
+                break;
+            }
             yield return item;
+        }
     }
 }

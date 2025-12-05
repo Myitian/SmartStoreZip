@@ -111,18 +111,7 @@ sealed class Program
             while (Console.In.ReadLine().AsSpan().Trim().Trim('"') is { IsEmpty: false } line && queue.TryAdd(new(line))) ;
             queue.CompleteAdding();
         });
-        while (!queue.IsCompleted)
-        {
-            string item;
-            try
-            {
-                item = queue.Take();
-            }
-            catch
-            {
-                break;
-            }
+        while (queue.TryTake(out string? item, Timeout.Infinite))
             yield return item;
-        }
     }
 }
